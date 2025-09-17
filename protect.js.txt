@@ -1,0 +1,25 @@
+import { USE_FIREBASE, firebaseConfig } from '../firebase-config.js';
+
+async function protectPage(expectedRole) {
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js');
+  const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
+  const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, async user => {
+    if (!user) {
+      location.href = 'index.html';
+    } else {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      const role = snap.data().role;
+      if (role !== expectedRole && expectedRole !== 'any') {
+        location.href = 'index.html';
+      }
+    }
+  });
+}
+
+export default protectPage;
