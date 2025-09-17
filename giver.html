@@ -1,146 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Giver Dashboard - Falaa Freebies</title>
+  <meta charset="utf-8">
+  <title>Giver Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard-container">
-    <h1>🎁 Giver Dashboard</h1>
-    <p>Share items you no longer need with others.</p>
-
-    <!-- Upload Form -->
-    <div class="form-box glass-box">
-      <h2>Upload Item</h2>
-      <input type="text" id="itemTitle" placeholder="Item Title" required>
-      <textarea id="itemDesc" placeholder="Item Description" rows="3"></textarea>
-      <input type="text" id="itemLocation" placeholder="Location (e.g. Accra, Ghana)" required>
-      <input type="file" id="itemImage" accept="image/*">
-      <button onclick="uploadItem()">Upload</button>
-    </div>
-
-    <!-- My Items -->
-    <div class="glass-box">
-      <h2>📦 My Items</h2>
-      <div id="myItems"></div>
-    </div>
-
-    <!-- Incoming Requests -->
-    <div class="glass-box">
-      <h2>📩 Incoming Requests</h2>
-      <div id="myRequests"></div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav">
-      <a href="browse.html">🌍 Browse</a>
-      <a href="chat.html">💬 Chat</a>
-      <a href="profile.html">👤 Profile</a>
-      <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
+  <div class="dashboard">
+    <h1>Giver Dashboard</h1>
+    <nav class="nav">
+      <a href="browse.html">Browse</a>
+      <a href="chat.html">Chat</a>
+      <a href="index.html">Logout</a>
+    </nav>
   </div>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
-  <script src="assets/app.js"></script>
-  <script>
-    // Load user's items
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const snapshot = await db.collection("items")
-          .where("owner", "==", user.uid)
-          .orderBy("createdAt", "desc")
-          .get();
-
-        let html = "";
-        snapshot.forEach(doc => {
-          const item = doc.data();
-          html += `
-            <div class="item-card glass-box">
-              <h3>${item.title}</h3>
-              <p>${item.description}</p>
-              <p><strong>📍 ${item.location || "Unknown"}</strong></p>
-              ${item.imageUrl ? `<img src="${item.imageUrl}" class="item-img">` : ""}
-            </div>
-          `;
-        });
-        document.getElementById("myItems").innerHTML = html || "<p>No items yet.</p>";
-
-        // Load incoming requests
-        loadRequests(user.uid);
-      }
-    });
-
-    // Upload item
-    async function uploadItem() {
-      const title = document.getElementById("itemTitle").value.trim();
-      const description = document.getElementById("itemDesc").value.trim();
-      const location = document.getElementById("itemLocation").value.trim();
-      const file = document.getElementById("itemImage").files[0];
-      const user = auth.currentUser;
-
-      if (!title || !location || !user) {
-        alert("Please fill all fields and login first.");
-        return;
-      }
-
-      let imageUrl = "";
-      if (file) {
-        const storageRef = storage.ref(`items/${user.uid}/${Date.now()}-${file.name}`);
-        await storageRef.put(file);
-        imageUrl = await storageRef.getDownloadURL();
-      }
-
-      await db.collection("items").add({
-        owner: user.uid,
-        title: title,
-        description: description,
-        location: location,
-        imageUrl: imageUrl,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      alert("Item uploaded!");
-      location.reload();
-    }
-
-    // Load incoming requests
-    async function loadRequests(ownerId) {
-      const snapshot = await db.collection("requests")
-        .where("giverId", "==", ownerId)
-        .orderBy("createdAt", "desc")
-        .get();
-
-      let html = "";
-      snapshot.forEach(doc => {
-        const req = doc.data();
-        html += `
-          <div class="request-card glass-box">
-            <p><strong>${req.itemTitle}</strong> requested by ${req.takerId}</p>
-            <p>Status: ${req.status}</p>
-            ${req.status === "pending" ? `
-              <button onclick="respondRequest('${doc.id}', 'accepted')">✅ Accept</button>
-              <button onclick="respondRequest('${doc.id}', 'declined')">❌ Decline</button>
-            ` : ""}
-          </div>
-        `;
-      });
-
-      document.getElementById("myRequests").innerHTML = html || "<p>No requests yet.</p>";
-    }
-
-    // Respond to request
-    async function respondRequest(requestId, decision) {
-      await db.collection("requests").doc(requestId).update({
-        status: decision
-      });
-      alert("Request " + decision + "!");
-      location.reload();
-    }
+  <script type="module">
+    import protectPage from './js/protect.js';
+    protectPage('giver');
   </script>
 </body>
 </html>
