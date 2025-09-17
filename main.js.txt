@@ -1,0 +1,40 @@
+import { initAuth, registerUser, loginUser } from './auth.js';
+
+const msg = document.getElementById('msg');
+
+async function setup() {
+  await initAuth();
+
+  document.getElementById('registerForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('regEmail').value;
+    const pass = document.getElementById('regPassword').value;
+    const role = document.getElementById('regRole').value;
+    try {
+      const user = await registerUser(email, pass, role);
+      msg.textContent = 'Registered successfully!';
+      redirectToDashboard(user.role);
+    } catch (err) {
+      msg.textContent = err.message;
+    }
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const pass = document.getElementById('loginPassword').value;
+    try {
+      const user = await loginUser(email, pass);
+      msg.textContent = 'Login successful!';
+      redirectToDashboard(user.role);
+    } catch (err) {
+      msg.textContent = err.message;
+    }
+  });
+}
+
+function redirectToDashboard(role) {
+  if (role === 'giver') location.href = 'giver.html';
+  else if (role === 'taker') location.href = 'taker.html';
+  else if (role === 'both') location.href = 'both.html';
+}
