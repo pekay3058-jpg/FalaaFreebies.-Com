@@ -1,97 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Browse - Falaa Freebies</title>
+  <meta charset="utf-8">
+  <title>Browse Freebies</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard-container">
-    <h1>🌍 Browse Freebies</h1>
-    <p>Showing items from the last 24 hours</p>
-
-    <!-- Items Feed -->
-    <div class="glass-box">
-      <div id="browseFeed"></div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav">
-      <a href="giver.html">📦 Giver</a>
-      <a href="taker.html">🤝 Taker</a>
-      <a href="both.html">🔄 Both</a>
-      <a href="chat.html">💬 Chat</a>
-      <a href="profile.html">👤 Profile</a>
-      <a href="#" onclick="logout()">🚪 Logout</a>
-    </div>
+  <div class="dashboard">
+    <h1>Browse Freebies</h1>
+    <p>Here users can browse shared freebies.</p>
+    <nav class="nav">
+      <a href="giver.html">Giver</a>
+      <a href="taker.html">Taker</a>
+      <a href="both.html">Both</a>
+      <a href="chat.html">Chat</a>
+      <a href="index.html">Logout</a>
+    </nav>
   </div>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
-  <script src="assets/app.js"></script>
-
-  <script>
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        // If no user logged in, send them back to login
-        window.location.href = "index.html";
-        return;
-      }
-
-      // Load items from last 24 hours
-      const now = new Date();
-      const yesterday = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-
-      const itemsSnap = await db.collection("items")
-        .where("createdAt", ">=", yesterday)
-        .orderBy("createdAt", "desc")
-        .get();
-
-      let itemsHtml = "";
-      itemsSnap.forEach(doc => {
-        const item = doc.data();
-        itemsHtml += `
-          <div class="item-card glass-box">
-            <h3>${item.title}</h3>
-            <p>${item.description}</p>
-            <p><strong>📍 ${item.location || "Unknown"}</strong></p>
-            ${item.imageUrl ? `<img src="${item.imageUrl}" class="item-img">` : ""}
-            <button class="request-btn" onclick="requestItem('${doc.id}', '${item.owner}', '${item.title}')">🤝 Request</button>
-          </div>
-        `;
-      });
-
-      document.getElementById("browseFeed").innerHTML = itemsHtml || "<p>No items uploaded in the last 24 hours.</p>";
-    });
-
-    async function requestItem(itemId, ownerId, itemTitle) {
-      const user = auth.currentUser;
-      if (!user) {
-        alert("Please login first.");
-        return;
-      }
-
-      await db.collection("requests").add({
-        itemId: itemId,
-        itemTitle: itemTitle,
-        giverId: ownerId,
-        takerId: user.uid,
-        status: "pending",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      const chatId = [user.uid, ownerId].sort().join("_");
-      await db.collection("chats").doc(chatId).set({
-        users: [user.uid, ownerId],
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-
-      alert("Request sent! Opening chat...");
-      window.location.href = "chat.html?chatId=" + chatId;
-    }
+  <script type="module">
+    import protectPage from './js/protect.js';
+    protectPage('any');
   </script>
 </body>
 </html>
