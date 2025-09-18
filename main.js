@@ -1,40 +1,53 @@
-import { initAuth, registerUser, loginUser } from './auth.js';
 
-const msg = document.getElementById('msg');
+import { auth, db } from "./firebase-init.js";
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-async function setup() {
-  await initAuth();
+import { 
+  doc, setDoc 
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  document.getElementById('registerForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPassword').value;
-    const role = document.getElementById('regRole').value;
-    try {
-      const user = await registerUser(email, pass, role);
-      msg.textContent = 'Registered successfully!';
-      redirectToDashboard(user.role);
-    } catch (err) {
-      msg.textContent = err.message;
-    }
-  });
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const msg = document.getElementById("msg");
 
-  document.getElementById('loginForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const pass = document.getElementById('loginPassword').value;
-    try {
-      const user = await loginUser(email, pass);
-      msg.textContent = 'Login successful!';
-      redirectToDashboard(user.role);
-    } catch (err) {
-      msg.textContent = err.message;
-    }
-  });
-}
+// Login
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = loginForm["loginEmail"].value;
+  const password = loginForm["loginPassword"].value;
 
-function redirectToDashboard(role) {
-  if (role === 'giver') location.href = 'giver.html';
-  else if (role === 'taker') location.href = 'taker.html';
-  else if (role === 'both') location.href = 'both.html';
-}
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    msg.textContent = "✅ Login successful!";
+  } catch (err) {
+    msg.textContent = "❌ " + err.message;
+  }
+});
+
+// Register
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = registerForm["regEmail"].value;
+  const password = registerForm["regPassword"].value;
+  const role = registerForm["regRole"].value;
+
+  try {
+    // Create user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Save user info to Firestore (under "users" collection)
+    await setDoc(doc(db, "users", user.uid), {
+      email: email,
+      role: role,
+      createdAt: new Date()
+    });
+
+    msg.textContent = "✅ Registration successful!";
+  } catch (err) {
+    msg.textContent = "❌ " + err.message;
+  }
+});
