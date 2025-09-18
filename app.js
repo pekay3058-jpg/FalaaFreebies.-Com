@@ -1,51 +1,46 @@
-// ===============================
-// Falaa Freebies - Firebase Setup
-// ===============================
 
-// Your real Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
-  authDomain: "falaa-freebies.firebaseapp.com",
-  projectId: "falaa-freebies",
-  storageBucket: "falaa-freebies.appspot.com", // fixed bucket name
-  messagingSenderId: "842425176920",
-  appId: "1:842425176920:web:aa538c8212f12dd41fcb2d",
-  measurementId: "G-YQFW6R14L6"
-};
+// app.js
 
-// Initialize Firebase (only once)
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+// Redirect users based on their role
+function handleUserRedirect(user) {
+  if (!user) {
+    // Not logged in → always go to login page
+    if (!window.location.pathname.endsWith("index.html")) {
+      window.location.href = "index.html";
+    }
+  } else {
+    // Logged in → check Firestore role
+    db.collection("users").doc(user.uid).get().then((snap) => {
+      const data = snap.data();
+      if (!data) return;
+
+      const role = data.role;
+      if (role === "admin" && !window.location.pathname.endsWith("dashboard-admin.html")) {
+        window.location.href = "dashboard-admin.html";
+      } else if (role === "user" && !window.location.pathname.endsWith("dashboard-user.html")) {
+        window.location.href = "dashboard-user.html";
+      }
+    }).catch((err) => {
+      console.error("Error fetching role:", err);
+    });
+  }
 }
 
-// Firebase services
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// ===============================
-// Global Helper Functions
-// ===============================
-
-// Logout
-function logout() {
-  auth.signOut().then(() => {
-    window.location.href = "index.html";
-  }).catch((error) => {
-    alert("Error logging out: " + error.message);
-  });
-}
-
-// Format Firestore timestamp
-function formatDate(timestamp) {
-  if (!timestamp) return "";
-  const date = timestamp.toDate();
-  return date.toLocaleString();
-}
-
-// Auth check → redirect to login if not signed in
+// Watch auth state changes
 auth.onAuthStateChanged((user) => {
-  if (!user && !window.location.pathname.endsWith("index.html")) {
-    window.location.href = "index.html";
+  handleUserRedirect(user);
+});
+
+// Optional: logout button handler
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      auth.signOut().then(() => {
+        window.location.href = "index.html";
+      }).catch((error) => {
+        alert("Logout failed: " + error.message);
+      });
+    });
   }
 });
