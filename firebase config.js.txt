@@ -1,0 +1,19 @@
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIza...",
+    authDomain: "falaa-freebies.firebaseapp.com",
+    projectId: "falaa-freebies",
+    storageBucket: "falaa-freebies.appspot.com",
+    messagingSenderId: "842425176920",
+    appId: "1:842425176920:web:aa538c8212f12dd41fcb2d",
+    measurementId: "G-YQFW6R14L6"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
