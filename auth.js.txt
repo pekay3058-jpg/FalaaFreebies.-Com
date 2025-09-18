@@ -1,34 +1,45 @@
-import { USE_FIREBASE, firebaseConfig } from '../firebase-config.js';
 
-let app, auth, db;
+// auth.js
 
-export async function initAuth() {
-  if (!USE_FIREBASE) return;
-  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js');
-  const { getAuth } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
-  const { getFirestore } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
+// Initialize Firebase (uses config from firebase-config.js)
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Register a new user
+async function registerUser(email, password, role) {
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection("users").doc(cred.user.uid).set({
+      email,
+      role
+    });
+    return { uid: cred.user.uid, role };
+  } catch (error) {
+    console.error("Error registering user:", error.message);
+    alert(error.message);
+  }
 }
 
-export async function registerUser(email, password, role) {
-  const { createUserWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
-  const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, 'users', cred.user.uid), { email, role });
-  return { uid: cred.user.uid, role };
+// Login user
+async function loginUser(email, password) {
+  try {
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    const snap = await db.collection("users").doc(cred.user.uid).get();
+    return { uid: cred.user.uid, role: snap.data().role };
+  } catch (error) {
+    console.error("Error logging in:", error.message);
+    alert(error.message);
+  }
 }
 
-export async function loginUser(email, password) {
-  const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
-  const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
-  const cred = await signInWithEmailAndPassword(auth, email, password);
-  const snap = await getDoc(doc(db, 'users', cred.user.uid));
-  return { uid: cred.user.uid, role: snap.data().role };
-}
-
-export async function signOutUser() {
-  const { signOut } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
-  await signOut(auth);
+// Logout user
+async function signOutUser() {
+  try {
+    await auth.signOut();
+  } catch (error) {
+    console.error("Error signing out:", error.message);
+    alert(error.message);
+  }
 }
