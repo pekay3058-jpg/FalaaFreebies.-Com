@@ -1,5 +1,6 @@
-
 // app.js
+
+import { auth, db, storage } from "../firebase-init.js";
 
 // Redirect users based on their role
 function handleUserRedirect(user) {
