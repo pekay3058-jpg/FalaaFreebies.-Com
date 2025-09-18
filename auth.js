@@ -1,5 +1,6 @@
-
 // auth.js
+
+import { auth, db, storage } from "../firebase-init.js";
 
 // Initialize Firebase (uses config from firebase-config.js)
 firebase.initializeApp(firebaseConfig);
