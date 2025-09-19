@@ -1,3 +1,4 @@
+import { auth, db, storage } from "../firebase-init.js";
 import { USE_FIREBASE, firebaseConfig } from '../firebase-config.js';
 
 async function protectPage(expectedRole) {
