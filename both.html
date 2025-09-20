@@ -1,36 +1,121 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Both Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Both • FalaaFreebies</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard">
-    <h1>Both Dashboard</h1>
+  <header class="topbar">
     <nav class="nav">
-      <a href="browse.html">Browse</a>
-      <a href="chat.html">Chat</a>
-      <a href="index.html">Logout</a>
+      <a class="brand" href="index.html">FalaaFreebies</a>
+      <div class="nav-right">
+        <a href="both.html">Home</a>
+        <a href="both.html#add">Add Item</a>
+        <a href="both.html#browse">Browse</a>
+        <button id="logoutBtn" class="btn-ghost">Logout</button>
+      </div>
     </nav>
-  </div>
-  <script type="module">
-    import protectPage from './js/protect.js';
-    protectPage('both');
-  </script>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1>Giver & Taker • Combined Dashboard</h1>
+      <p class="muted">You can both post items and browse items.</p>
+
+      <!-- Add Item -->
+      <section id="add" class="card-section">
+        <h2>Add New Item</h2>
+        <form id="addItemForm" class="form">
+          <input id="itemTitle" name="title" type="text" placeholder="Title" required />
+          <select id="itemCategory" name="category" required>
+            <option value="">Category</option>
+            <option value="food">Food</option>
+            <option value="clothes">Clothes</option>
+            <option value="electronics">Electronics</option>
+            <option value="other">Other</option>
+          </select>
+          <textarea id="itemDescription" name="description" rows="4" placeholder="Description"></textarea>
+          <input id="itemPhoto" name="photo" type="file" accept="image/*" />
+          <button type="submit">Post Item</button>
+        </form>
+      </section>
+
+      <!-- Browse -->
+      <section id="browse" class="card-section">
+        <h2>Browse</h2>
+        <div class="search-row">
+          <input id="searchInput" type="search" placeholder="Search items or keywords" />
+          <button id="searchBtn">Search</button>
+        </div>
+        <div id="categories" class="categories-grid" style="margin-top:12px;">
+          <button class="category-btn" data-cat="food">Food</button>
+          <button class="category-btn" data-cat="clothes">Clothes</button>
+          <button class="category-btn" data-cat="electronics">Electronics</button>
+          <button class="category-btn" data-cat="other">Other</button>
+        </div>
+        <div id="browseResults" class="items-grid" style="margin-top:12px;">
+          <!-- js/browse.js renders results -->
+        </div>
+      </section>
+
+      <!-- My Items -->
+      <section class="card-section">
+        <h2>My Items</h2>
+        <div id="myItemsList" class="items-grid">
+          <!-- js/giver.js renders user's items -->
+        </div>
+      </section>
+
+      <!-- Chat -->
+      <section class="card-section">
+        <h2>Chat</h2>
+        <div id="chatPanel">
+          <!-- js/chat.js will mount here -->
+        </div>
+      </section>
+
+      <div id="msg" class="muted"></div>
+    </section>
+  </main>
+
+  <footer class="footer">© FalaaFreebies</footer>
 
   <!-- Firebase setup -->
-<script type="module" src="firebase-init.js"></script>
+  <script type="module" src="js/firebase-init.js"></script>
 
-<!-- Core JS files -->
-<script type="module" src="js/app.js"></script>
-<script type="module" src="js/main.js"></script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/protect.js"></script>
+  <!-- Core + page scripts -->
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/protect.js"></script>
 
-<!-- Both feature -->
-<script type="module" src="js/giver.js"></script>
-<script type="module' src="js/taker.js"></script>
-  
+  <!-- Page logic -->
+  <script type="module" src="js/giver.js"></script>
+  <script type="module" src="js/browse.js"></script>
+  <script type="module" src="js/chat.js"></script>
+
+  <!-- Immediate role protection: only 'both' allowed -->
+  <script type="module">
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    (async function protectByRole(){
+      if (!window.auth) return;
+      const user = window.auth.currentUser;
+      if (!user) return;
+      try {
+        const userDoc = await getDoc(doc(window.db, "users", user.uid));
+        const role = userDoc.exists() ? userDoc.data().role : null;
+        if (role !== "both") {
+          alert("This page is for users with role 'both'. Redirecting...");
+          if (role === "giver") window.location = "giver.html";
+          else if (role === "taker") window.location = "taker.html";
+          else window.location = "index.html";
+        }
+      } catch (err) {
+        console.error("Role check failed:", err);
+      }
+    })();
+  </script>
 </body>
 </html>
