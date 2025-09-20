@@ -1,34 +1,101 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Taker Dashboard</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Taker • FalaaFreebies</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard">
-    <h1>Taker Dashboard</h1>
+  <header class="topbar">
     <nav class="nav">
-      <a href="browse.html">Browse</a>
-      <a href="chat.html">Chat</a>
-      <a href="index.html">Logout</a>
+      <a class="brand" href="index.html">FalaaFreebies</a>
+      <div class="nav-right">
+        <a href="taker.html">Browse</a>
+        <a href="both.html">Add/Manage (Both)</a>
+        <button id="logoutBtn" class="btn-ghost">Logout</button>
+      </div>
     </nav>
-  </div>
-  <script type="module">
-    import protectPage from './js/protect.js';
-    protectPage('taker');
-  </script>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1>Taker Dashboard</h1>
+      <p class="muted">Browse categories and search for available items.</p>
+
+      <!-- Search -->
+      <section class="card-section">
+        <div class="search-row">
+          <input id="searchInput" type="search" placeholder="Search items or keywords" />
+          <button id="searchBtn">Search</button>
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section class="card-section">
+        <h2>Categories</h2>
+        <div id="categories" class="categories-grid">
+          <button class="category-btn" data-cat="food">Food</button>
+          <button class="category-btn" data-cat="clothes">Clothes</button>
+          <button class="category-btn" data-cat="electronics">Electronics</button>
+          <button class="category-btn" data-cat="other">Other</button>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="card-section">
+        <h2>Available Items</h2>
+        <div id="browseResults" class="items-grid">
+          <!-- js/browse.js should render item cards here -->
+        </div>
+      </section>
+
+      <!-- Chat -->
+      <section class="card-section">
+        <h2>Chat</h2>
+        <div id="chatPanel">
+          <!-- js/chat.js will mount chat UI here -->
+        </div>
+      </section>
+
+      <div id="msg" class="muted"></div>
+    </section>
+  </main>
+
+  <footer class="footer">© FalaaFreebies</footer>
 
   <!-- Firebase setup -->
-<script type="module" src="firebase-init.js"></script>
+  <script type="module" src="js/firebase-init.js"></script>
 
-<!-- Core JS files -->
-<script type="module" src="js/app.js"></script>
-<script type="module" src="js/main.js"></script>
-<script type="module" src="js/auth.js"></script>
-<script type="module" src="js/protect.js"></script>
+  <!-- Core + page scripts -->
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/protect.js"></script>
 
-<!-- Taker feature -->
-<script type="module" src="js/taker.js"></script>
+  <!-- Browse + chat logic -->
+  <script type="module" src="js/browse.js"></script>
+  <script type="module" src="js/chat.js"></script>
+
+  <!-- Immediate role protection: only 'taker' or 'both' allowed -->
+  <script type="module">
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    (async function protectByRole(){
+      if (!window.auth) return;
+      const user = window.auth.currentUser;
+      if (!user) return;
+      try {
+        const userDoc = await getDoc(doc(window.db, "users", user.uid));
+        const role = userDoc.exists() ? userDoc.data().role : null;
+        if (role !== "taker" && role !== "both") {
+          alert("Access denied for your role. Redirecting...");
+          if (role === "giver") window.location = "giver.html";
+          else window.location = "index.html";
+        }
+      } catch (err) {
+        console.error("Role check failed:", err);
+      }
+    })();
+  </script>
 </body>
 </html>
