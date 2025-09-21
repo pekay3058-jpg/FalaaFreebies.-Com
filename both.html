@@ -56,7 +56,7 @@
           <button class="category-btn" data-cat="other">Other</button>
         </div>
         <div id="browseResults" class="items-grid" style="margin-top:12px;">
-          <!-- js/browse.js renders results -->
+          <!-- browse.js renders results -->
         </div>
       </section>
 
@@ -64,7 +64,7 @@
       <section class="card-section">
         <h2>My Items</h2>
         <div id="myItemsList" class="items-grid">
-          <!-- js/giver.js renders user's items -->
+          <!-- giver.js renders user's items -->
         </div>
       </section>
 
@@ -72,7 +72,7 @@
       <section class="card-section">
         <h2>Chat</h2>
         <div id="chatPanel">
-          <!-- js/chat.js will mount here -->
+          <!-- chat.js will mount here -->
         </div>
       </section>
 
@@ -83,17 +83,17 @@
   <footer class="footer">© FalaaFreebies</footer>
 
   <!-- Firebase setup -->
-  <script type="module" src="js/firebase-init.js"></script>
+  <script type="module" src="./firebase-init.js"></script>
 
   <!-- Core + page scripts -->
-  <script type="module" src="js/app.js"></script>
-  <script type="module" src="js/auth.js"></script>
-  <script type="module" src="js/protect.js"></script>
+  <script type="module" src="./app.js"></script>
+  <script type="module" src="./auth.js"></script>
+  <script type="module" src="./protect.js"></script>
 
   <!-- Page logic -->
-  <script type="module" src="js/giver.js"></script>
-  <script type="module" src="js/browse.js"></script>
-  <script type="module" src="js/chat.js"></script>
+  <script type="module" src="./giver.js"></script>
+  <script type="module" src="./browse.js"></script>
+  <script type="module" src="./chat.js"></script>
 
   <!-- Immediate role protection: only 'both' allowed -->
   <script type="module">
