@@ -1,25 +1,25 @@
+// auth.js
+import { auth, db } from "./firebase-init.js"; // make sure path is correct
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-import { 
-  doc, setDoc, getDoc 
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Grab elements
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const msgDiv = document.getElementById("msg");
 
-// ✅ Utility: show message
+// Show messages
 function showMsg(text, isError = false) {
   msgDiv.textContent = text;
   msgDiv.style.color = isError ? "red" : "green";
 }
 
-// ✅ Register
+// Register
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -36,7 +36,6 @@ if (registerForm) {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // Save role in Firestore
       await setDoc(doc(db, "users", uid), { email, role });
 
       showMsg("✅ Registered successfully! You can now log in.");
@@ -47,7 +46,7 @@ if (registerForm) {
   });
 }
 
-// ✅ Login
+// Login
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -58,13 +57,12 @@ if (loginForm) {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCred.user.uid;
 
-      // Fetch role from Firestore
       const docSnap = await getDoc(doc(db, "users", uid));
       const role = docSnap.exists() ? docSnap.data().role : "unknown";
 
       showMsg(`✅ Welcome back! Role: ${role}`);
 
-      // Example redirect (adjust as needed)
+      // Redirect based on role
       if (role === "giver") window.location.href = "giver.html";
       else if (role === "taker") window.location.href = "taker.html";
       else if (role === "both") window.location.href = "both.html";
@@ -76,11 +74,8 @@ if (loginForm) {
   });
 }
 
-// ✅ Optional: Listen for auth state changes
+// Optional: listen for auth state
 onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("User is signed in:", user.email);
-  } else {
-    console.log("No user signed in");
-  }
+  if (user) console.log("User signed in:", user.email);
+  else console.log("No user signed in");
 });
