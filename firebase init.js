@@ -23,4 +23,8 @@ const db = getFirestore(app);
 window.auth = auth;
 window.db = db;
 
-export { auth, db };
+export { auth, db }
+
+// Export auth and Firestore
+export const auth = getAuth(app);
+export const db = getFirestore(app);
