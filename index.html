@@ -37,12 +37,14 @@
     <footer class="footer">© FalaaFreebies</footer>
   </main>
 
-  <!-- ✅ Firebase Initialization directly in HTML -->
+  <!-- ✅ Firebase Initialization -->
   <script type="module">
+    // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
       authDomain: "falaa-freebies.firebaseapp.com",
@@ -58,10 +60,8 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Export for other JS files if needed
-    window.firebaseApp = app;
-    window.firebaseAuth = auth;
-    window.firebaseDB = db;
+    // Export so other JS modules can import
+    export { app, auth, db };
   </script>
 
   <!-- Core JS files -->
