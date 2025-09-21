@@ -11,13 +11,15 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-s
 import { firebaseConfig } from "./firebase-config.js"; // adjust path
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey:"AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
+  authDomain: "falaa-freebiesfirebaseapp.com",
+  projectId: "falaa-freebies",
+  storageBucket: "falaa-freebies.appspot.com",
+  messagingSenderId:"842425176920",
+  appId:1:842425176920:web:aa538c8212f12dd41fcb2d",
+  measurementId: "G-YQFW6R14L6"
 };
+
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
