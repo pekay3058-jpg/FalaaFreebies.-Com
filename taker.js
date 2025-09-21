@@ -1,4 +1,4 @@
-// js/taker.js
+// taker.js
 import { auth, db } from "./firebase-init.js";
 import {
   collection,
