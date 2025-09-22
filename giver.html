@@ -19,7 +19,15 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const firebaseConfig = { /* paste your config here */ };
+  const firebaseConfig = {
+  apiKey: "AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
+  authDomain: "falaa-freebies.firebaseapp.com",
+  projectId: "falaa-freebies",
+  storageBucket: "falaa-freebies.appspot.com", // fixed bucket name
+  messagingSenderId: "842425176920",
+  appId: "1:842425176920:web:aa538c8212f12dd41fcb2d",
+  measurementId: "G-YQFW6R14L6"
+}
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
