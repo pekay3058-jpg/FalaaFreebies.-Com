@@ -1,0 +1,45 @@
+// js/firestore.js
+import { db } from "../firebase-init.js";
+import {
+  collection, addDoc, doc, setDoc, getDoc, getDocs, query,
+  where, orderBy, updateDoc, serverTimestamp, runTransaction, onSnapshot, limit
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/**
+ * Collections:
+ * - users
+ * - items
+ * - chats
+ */
+
+export const createItem = async (item) => {
+  // item = { title, description, category, ownerId, imageURL }
+  const ref = await addDoc(collection(db, "items"), {
+    ...item,
+    status: "available",
+    createdAt: serverTimestamp()
+  });
+  return ref.id;
+};
+
+export const listItems = async ({ category = null, search = null, limitCount = 50 } = {}) => {
+  let q = collection(db, "items");
+  const constraints = [];
+  if (category) constraints.push(where("category", "==", category));
+  constraints.push(orderBy("createdAt", "desc"));
+  if (constraints.length) q = query(collection(db, "items"), ...constraints);
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+};
+
+// Claim an item: transactionally set status and add claim record
+export const claimItem = async (itemId, claimerId) => {
+  const itemRef = doc(db, "items", itemId);
+  await runTransaction(db, async (tx) => {
+    const itemDoc = await tx.get(itemRef);
+    if (!itemDoc.exists()) throw new Error("Item not found");
+    const status = itemDoc.data().status;
+    if (status !== "available") throw new Error("Item not available");
+    tx.update(itemRef, { status: "claimed", claimedBy: claimerId, claimedAt: serverTimestamp() });
+  });
+};
