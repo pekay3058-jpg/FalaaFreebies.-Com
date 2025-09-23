@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Post Item — FalaaFreebies</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+  <header class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-semibold">Post an Item</h1>
+    <a href="../dashboards/giver.html" class="btn-primary">My Dashboard</a>
+  </header>
+
+  <main class="max-w-xl">
+    <input id="title" class="input" placeholder="Title" />
+    <input id="category" class="input" placeholder="Category (e.g., Food, Clothing)" />
+    <textarea id="description" class="input" placeholder="Description" rows="4"></textarea>
+    <input id="file" type="file" accept="image/*" class="mt-2" />
+    <div id="progress" class="text-sm mt-2"></div>
+    <button id="post" class="btn-primary mt-3">Post Item</button>
+  </main>
+
+  <script type="module" src="../firebase-init.js"></script>
+  <script type="module">
+    import { auth } from "../firebase-init.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { uploadAndCreateItem } from "../js/upload.js";
+
+    let currentUser;
+    onAuthStateChanged(auth, user => {
+      if (!user) location.replace("/index.html");
+      currentUser = user;
+    });
+
+    const el = id => document.getElementById(id);
+    el("post").addEventListener("click", async () => {
+      if (!currentUser) { alert("Not signed in"); return; }
+      const title = el("title").value.trim();
+      const category = el("category").value.trim();
+      const description = el("description").value.trim();
+      const file = el("file").files[0];
+      if (!title || !category || !file) return alert("Title, category and image are required.");
+
+      el("post").disabled = true;
+      el("progress").textContent = "Uploading...";
+
+      try {
+        const metadata = { title, description, category, ownerId: currentUser.uid };
+        const res = await uploadAndCreateItem(file, metadata, pct => el("progress").textContent = `Uploading ${pct}%`);
+        el("progress").textContent = "Posted successfully.";
+        // redirect to giver dashboard
+        setTimeout(() => location.replace("/dashboards/giver.html"), 900);
+      } catch (err) {
+        console.error(err);
+        el("progress").textContent = "Upload failed: " + err.message;
+        el("post").disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
