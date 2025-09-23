@@ -1,0 +1,34 @@
+// js/chat.js
+import { db } from "../firebase-init.js";
+import {
+  collection, doc, addDoc, serverTimestamp, query, where, onSnapshot, orderBy
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+/**
+ * createChatIfNotExists(participants: [uid1,uid2]) -> chatId
+ * sendMessage(chatId, senderId, text)
+ * listenMessages(chatId, callback) -> returns unsubscribe
+ */
+
+export const createChatIfNotExists = async (participants) => {
+  // chatId is based on sorted participant ids for idempotency (optional)
+  const chatRef = await addDoc(collection(db, "chats"), {
+    participants,
+    createdAt: serverTimestamp()
+  });
+  return chatRef.id;
+};
+
+export const sendMessage = async (chatId, senderId, text) => {
+  const messagesRef = collection(db, "chats", chatId, "messages");
+  await addDoc(messagesRef, { senderId, text, createdAt: serverTimestamp() });
+};
+
+export const listenMessages = (chatId, callback) => {
+  const messagesRef = collection(db, "chats", chatId, "messages");
+  const q = query(messagesRef, orderBy("createdAt", "asc"));
+  return onSnapshot(q, (snap) => {
+    const messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    callback(messages);
+  });
+};
