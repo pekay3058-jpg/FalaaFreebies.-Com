@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Both Dashboard — FalaaFreebies</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-6">
+  <header class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-semibold">Both Dashboard</h1>
+    <div>
+      <a href="../uploads/upload.html" class="btn-primary">Post</a>
+      <a href="../browse/categories.html" class="ml-3">Browse</a>
+      <button id="logout" class="ml-3">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="items" class="grid grid-cols-1 gap-4"></section>
+  </main>
+
+  <script type="module" src="../firebase-init.js"></script>
+  <script type="module">
+    import { auth } from "../firebase-init.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { db } from "../firebase-init.js";
+    import { collection, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const itemsEl = document.getElementById("items");
+    onAuthStateChanged(auth, user => {
+      if (!user) location.replace("/index.html");
+      const q = query(collection(db, "items"), orderBy("createdAt", "desc"));
+      onSnapshot(q, snap => {
+        itemsEl.innerHTML = "";
+        snap.docs.forEach(d => {
+          const data = d.data();
+          const card = document.createElement("div");
+          card.className = "card flex gap-4";
+          card.innerHTML = `
+            <img src="${data.imageURL || ''}" style="width:100px;height:80px;object-fit:cover;border-radius:6px"/>
+            <div class="flex-1">
+              <h3 class="font-semibold">${data.title}</h3>
+              <p class="text-sm">${data.description || ''}</p>
+              <p class="text-xs">${data.status}</p>
+            </div>`;
+          itemsEl.appendChild(card);
+        });
+      });
+    });
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await signOut(auth);
+      location.replace("/index.html");
+    });
+  </script>
+</body>
+</html>
