@@ -121,6 +121,36 @@
           </div>
         </div>
 
+       <!-- Nav_bar -->
+        <nav>
+         <button data-target="giver">Giver</button>
+         <button data-target="taker">Taker</button>
+         <button data-target="both">Both</button>
+         <button data-target="chat">Chat</button>
+         <button data-target="browse">Browse</button>
+         </nav>
+
+        <!-- Dashboards -->
+        <div id="giver" class="page active">
+        <!-- Giver Dashboard -->
+        </div>
+
+        <div id="taker" class="page">
+        <!-- Taker Dashboard -->
+        </div>
+
+        <div id="both" class="page">
+        <!-- Both Dashboard -->
+        </div>
+
+        <div id="chat" class="page">
+        <!-- Chat -->
+        </div>
+
+        <div id="browse" class="page">
+        <!-- Browse -->
+        </div>
+
         <!-- App UI (hidden until logged in) -->
         <div id="appCard" class="card" style="display:none">
           <div class="tabs">
@@ -262,7 +292,7 @@
   } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
 
   // -------------------------
-  // firebase config
+  // firebase config - replace if needed
   // -------------------------
   const firebaseConfig = {
     apiKey: "AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
@@ -358,6 +388,18 @@
   let openChat = { chatId: null, itemId: null };
   let unreadCount = 0;
 
+  // rotating backgrounds (household + kids toys)
+  const backgrounds = [
+    "url('https://images.unsplash.com/photo-1581578731124-5f09f8fa1a92?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1584714262653-1c9d2d1b2f6b?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1582719478172-0c8b2f0b0a6d?q=80&w=1600&auto=format&fit=crop')"
+  ];
+  let bgIndex = 0;
+  function rotateBackground(){ bgOverlay.style.backgroundImage = backgrounds[bgIndex]; bgIndex = (bgIndex+1)%backgrounds.length; }
+  rotateBackground();
+  setInterval(rotateBackground, 8000);
 
   // -------------------------
   // Utilities
@@ -845,67 +887,21 @@
   document.getElementById('mbInbox').addEventListener('click', ()=> setActiveTab('inbox'));
   document.getElementById('mbProfile').addEventListener('click', ()=> setActiveTab('profile'));
 
-<!-- Navigation -->
-<nav>
-  <a href="#" class="nav-link active" data-target="giver">Giver</a>
-  <a href="#" class="nav-link" data-target="taker">Taker</a>
-  <a href="#" class="nav-link" data-target="both">Both</a>
-  <a href="#" class="nav-link" data-target="chat">Chat</a>
-  <a href="#" class="nav-link" data-target="browse">Browse</a>
-</nav>
-
-<!-- Pages -->
-<main>
-  <section id="giver" class="page active">
-    <h1>Giver Dashboard</h1>
-  </section>
-
-  <section id="taker" class="page">
-    <h1>Taker Dashboard</h1>
-  </section>
-
-  <section id="both" class="page">
-    <h1>Combined Dashboard</h1>
-  </section>
-
-  <section id="chat" class="page">
-    <h1>Chat</h1>
-  </section>
-
-  <section id="browse" class="page">
-    <h1>Browse Freebies</h1>
-  </section>
-</main>
-
-<style>
-  nav {display:flex;gap:1rem;background:#222;padding:1rem;}
-  nav a {color:white;text-decoration:none;padding:0.5rem 1rem;border-radius:6px;}
-  nav a.active, nav a:hover {background:#4cafef;}
-  .page {display:none;padding:2rem;}
-  .page.active {display:block;}
-</style>
-
-<script>
-  const navLinks = document.querySelectorAll(".nav-link");
-  const pages = document.querySelectorAll(".page");
-
-  navLinks.forEach(link=>{
-    link.addEventListener("click", e=>{
-      e.preventDefault();
-      // clear actives
-      navLinks.forEach(l=>l.classList.remove("active"));
-      pages.forEach(p=>p.classList.remove("active"));
-      // set active
-      link.classList.add("active");
-      document.getElementById(link.dataset.target).classList.add("active");
-    });
-  });
-</script>
-
+//--------------------
+// Giver Dashboard
+//--------------------
     
-  // -------------------------
-  // End of module
-  // -------------------------
+<div id="giver" class="page active">
+  <!-- Giver Dashboard -->
+
+  <!-- Giver content -->
+  <formid="giver">
+    <input type="text" placeholder="Item Title">
+    <textarea placeholder="Item Description"></textarea>
+    <button type="submit">Upload Freebie</button>
+  </form>
+  </div>
+    
   </script>
 </body>
 </html>
