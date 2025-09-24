@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Falaa Freebies</title>
+<meta name="theme-color" content="#6C4AB6"/>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --brand:#6C4AB6; --ink:#111827; --muted:#6b7280; --ring:#e5e7eb;
+    --success:#10b981; --danger:#ef4444;
+  }
+  [data-theme="dark"]{
+    --bg:#071025; --card:#071627; --ink:#e6eef8; --muted:#9aa6c0; --ring:#123042;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
+  body{transition:background 400ms ease}
+  .app{max-width:1100px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+  header.top{position:sticky;top:0;z-index:40;background:linear-gradient(90deg,#ffd4b8,#e6d6ff);padding:12px 16px;border-bottom:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,#ffd4b8,#e6d6ff);display:grid;place-items:center;font-weight:800;color:#3b2a4d}
+  .title{font-weight:800}
+  .controls{display:flex;gap:8px;align-items:center}
+  .toggle{border-radius:8px;padding:6px 8px;background:#fff;border:1px solid var(--ring);cursor:pointer}
+  main.screen{display:grid;grid-template-columns:1fr 340px;gap:14px;padding:14px}
+  @media(max-width:960px){ main.screen{grid-template-columns:1fr} }
+  .card{background:var(--card);border:1px solid var(--ring);border-radius:12px;padding:12px}
+  .muted{color:var(--muted);font-size:13px}
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tab{flex:1;padding:8px;border-radius:10px;border:1px solid var(--ring);text-align:center;cursor:pointer}
+  .tab.active{background:var(--brand);color:#fff;font-weight:700}
+  .list{display:grid;gap:12px}
+  .item{background:var(--card);border:1px solid var(--ring);border-radius:12px;overflow:hidden}
+  .item img{width:100%;height:200px;object-fit:cover;background:#f3f4f6}
+  .pad{padding:12px}
+  .meta{font-size:13px;color:var(--muted)}
+  input,textarea,select,button{width:100%;padding:10px;border-radius:10px;border:1px solid var(--ring);background:transparent;color:var(--ink);box-sizing:border-box}
+  button{background:var(--brand);color:#fff;border:none;cursor:pointer}
+  button.ghost{background:#fff;color:var(--brand);border:1px solid var(--ring)}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .progress{height:8px;background:#eef2ff;border-radius:99px;overflow:hidden;margin-top:8px}
+  .progress > span{display:block;height:100%;width:0;background:#6366f1}
+  /* chat */
+  .chat-wrap{display:flex;flex-direction:column;height:320px}
+  .chat-head{padding:8px;border-bottom:1px solid var(--ring);display:flex;justify-content:space-between;align-items:center}
+  .chat-body{flex:1;overflow:auto;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+  .bubble{max-width:80%;padding:8px 12px;border-radius:12px;background:#fff;border:1px solid var(--ring)}
+  .bubble.me{align-self:flex-end;background:#e6f4ff}
+  .bubble.them{align-self:flex-start}
+  .chat-foot{display:flex;gap:8px;padding:8px;border-top:1px solid var(--ring)}
+  .avatar{width:64px;height:64px;border-radius:999px;object-fit:cover;border:1px solid var(--ring);background:#f3f4f6}
+  /* toast */
+  .toast-container{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column-reverse;gap:8px;z-index:60}
+  .toast{min-width:240px;max-width:360px;background:var(--card);border:1px solid var(--ring);padding:10px 12px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.12);display:flex;gap:10px;align-items:center}
+  .toast .content{flex:1}
+  .toast .actions{display:flex;gap:6px}
+  .toast.info{border-left:4px solid #3b82f6}
+  .toast.success{border-left:4px solid var(--success)}
+  .toast.error{border-left:4px solid var(--danger)}
+  .badge{background:var(--danger);color:#fff;border-radius:999px;padding:3px 7px;font-size:12px}
+  /* mobile nav */
+  footer.mobilebar{display:none}
+  @media(max-width:960px){ footer.mobilebar{display:flex;position:sticky;bottom:0;background:var(--card);padding:8px;border-top:1px solid var(--ring);gap:6px;z-index:50} }
+  /* rotating bg overlay */
+  .bg-overlay{position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center;opacity:0.12;transition:background-image 800ms ease}
+</style>
+</head>
+<body data-theme="light">
+  <div class="bg-overlay" id="bgOverlay"></div>
+
+  <div class="app">
+    <header class="top card">
+      <div class="brand">
+        <div class="logo">FF</div>
+        <div>
+          <div class="title">Falaa Freebies</div>
+          <div class="muted">Give what you don't need — take what you do</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="btnDark" class="toggle">Dark</button>
+        <div id="userArea" style="display:flex;align-items:center;gap:12px">
+          <div id="userEmail" class="muted"></div>
+          <button id="btnLogout" class="ghost" style="display:none">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="screen">
+      <!-- Left column -->
+      <section>
+        <!-- Auth Card -->
+        <div id="authCard" class="card">
+          <h3>Get started</h3>
+          <div style="display:grid;gap:8px">
+            <input id="signupEmail" placeholder="Email" type="email">
+            <input id="signupPass" placeholder="Password (6+ chars)" type="password">
+            <select id="signupRole">
+              <option value="taker">Taker</option>
+              <option value="giver">Giver</option>
+              <option value="both" selected>Both</option>
+            </select>
+            <div style="display:flex;gap:8px">
+              <button id="btnSignup" type="button">Sign up</button>
+              <button id="btnShowLogin" class="ghost" type="button">Have account?</button>
+            </div>
+            <div id="signupMsg" class="muted"></div>
+          </div>
+
+          <div id="loginArea" style="margin-top:12px;display:none">
+            <hr/>
+            <h4>Login</h4>
+            <input id="loginEmail" placeholder="Email" type="email">
+            <input id="loginPass" placeholder="Password" type="password">
+            <div style="display:flex;gap:8px">
+              <button id="btnLogin" type="button">Log in</button>
+              <button id="btnShowSignup" class="ghost" type="button">Back</button>
+            </div>
+            <div id="loginMsg" class="muted"></div>
+          </div>
+        </div>
+
+        <!-- App UI (hidden until logged in) -->
+        <div id="appCard" class="card" style="display:none">
+          <div class="tabs">
+            <div class="tab active" data-tab="browse">Browse</div>
+            <div class="tab" data-tab="give">Give</div>
+            <div class="tab" data-tab="inbox">Inbox <span id="inboxDot" class="badge" style="display:none">0</span></div>
+            <div class="tab" data-tab="profile">Profile</div>
+          </div>
+
+          <!-- Browse -->
+          <div id="view-browse">
+            <div class="card pad" style="margin-bottom:12px">
+              <div class="row">
+                <input id="search" placeholder="Search title, desc, location...">
+                <button id="btnRefresh" class="ghost small">Refresh</button>
+              </div>
+              <div class="muted" id="roleHint" style="margin-top:8px"></div>
+            </div>
+            <div id="itemsList" class="list"></div>
+          </div>
+
+          <!-- Give -->
+          <div id="view-give" class="hide">
+            <div class="card pad">
+              <h4>Share an item</h4>
+              <input id="itemTitle" placeholder="Title">
+              <textarea id="itemDesc" rows="3" placeholder="Short description"></textarea>
+              <input id="itemLoc" placeholder="Location (e.g., Accra)">
+              <input id="itemImage" type="file" accept="image/*">
+              <div class="progress hide" id="uploadProgress"><span style="width:0%"></span></div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <button id="btnUpload" type="button">Upload</button>
+                <button id="btnClearUpload" class="ghost" type="button">Clear</button>
+              </div>
+              <div id="uploadMsg" class="muted" style="margin-top:8px"></div>
+            </div>
+            <div class="card pad">
+              <h4>My uploads</h4>
+              <div id="myItems" class="list"></div>
+            </div>
+          </div>
+
+          <!-- Inbox -->
+          <div id="view-inbox" class="hide">
+            <div class="card pad">
+              <h4>Conversations</h4>
+              <div id="chatList" class="list"></div>
+            </div>
+
+            <div id="chatPane" class="card pad hide">
+              <div class="chat-head" id="chatHeader">Chat</div>
+              <div class="chat-body" id="chatBody" style="height:260px;overflow:auto"></div>
+              <div class="chat-foot">
+                <input id="chatInput" placeholder="Type a message...">
+                <button id="btnSendMsg" type="button">Send</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile -->
+          <div id="view-profile" class="hide">
+            <div class="card pad">
+              <h4>Profile</h4>
+              <div style="display:flex;gap:12px;align-items:center">
+                <img id="pfAvatarPreview" class="avatar" src="" alt="avatar">
+                <div style="flex:1">
+                  <div class="muted">Email</div>
+                  <div id="pfEmail" class="muted"></div>
+                  <div style="margin-top:8px" class="muted">Display name</div>
+                  <input id="pfName" placeholder="Your display name"/>
+                  <div class="muted">Bio</div>
+                  <textarea id="pfBio" rows="2" placeholder="A short bio"></textarea>
+                  <div class="muted">Avatar</div>
+                  <input id="pfAvatar" type="file" accept="image/*">
+                  <div class="muted">Role</div>
+                  <select id="pfRole">
+                    <option value="taker">Taker</option>
+                    <option value="giver">Giver</option>
+                    <option value="both">Both</option>
+                  </select>
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button id="btnSaveProfile" type="button">Save profile</button>
+                    <button id="btnDeleteAvatar" class="ghost" type="button">Remove avatar</button>
+                  </div>
+                  <div id="pfMsg" class="muted" style="margin-top:8px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Right column -->
+      <aside>
+        <div class="card">
+          <h4>Quick actions</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button id="btnOpenGive" class="ghost" type="button">Open Give</button>
+            <button id="btnOpenInbox" class="ghost" type="button">Open Inbox</button>
+            <button id="btnOpenProfile" class="ghost" type="button">Open Profile</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h4>About</h4>
+          <div class="muted">Falaa Freebies — share things you no longer need and find freebies near you. Built with Firebase.</div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="mobilebar">
+      <button id="mbBrowse" class="ghost">Browse</button>
+      <button id="mbGive" class="ghost">Give</button>
+      <button id="mbInbox" class="ghost">Inbox <span id="mbBadge" class="badge" style="display:none">0</span></button>
+      <button id="mbProfile" class="ghost">Profile</button>
+    </footer>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Script: Firebase + App -->
+  <script type="module">
+  // -------------------------
+  // imports
+  // -------------------------
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  import {
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, signOut, updateProfile
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+  import {
+    getFirestore, doc, setDoc, getDoc, updateDoc,
+    collection, addDoc, query, where, orderBy, onSnapshot, getDocs, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  import {
+    getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject
+  } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+
+  // -------------------------
+  // firebase config - replace if needed
+  // -------------------------
+  const firebaseConfig = {
+    apiKey: "AIzaSyCB3TOwlnDAdh_x5NvLSCyORX_6oZbsZGc",
+    authDomain: "falaa-freebies.firebaseapp.com",
+    projectId: "falaa-freebies",
+    storageBucket: "falaa-freebies.appspot.com",
+    messagingSenderId: "842425176920",
+    appId: "1:842425176920:web:aa538c8212f12dd41fcb2d",
+    measurementId: "G-YQFW6R14L6"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // -------------------------
+  // DOM refs
+  // -------------------------
+  const authCard = document.getElementById('authCard');
+  const appCard  = document.getElementById('appCard');
+  const signupEmail = document.getElementById('signupEmail');
+  const signupPass  = document.getElementById('signupPass');
+  const signupRole  = document.getElementById('signupRole');
+  const signupMsg   = document.getElementById('signupMsg');
+  const btnSignup   = document.getElementById('btnSignup');
+  const btnShowLogin= document.getElementById('btnShowLogin');
+  const loginArea   = document.getElementById('loginArea');
+  const btnShowSignup= document.getElementById('btnShowSignup');
+  const loginEmail  = document.getElementById('loginEmail');
+  const loginPass   = document.getElementById('loginPass');
+  const btnLogin    = document.getElementById('btnLogin');
+  const loginMsg    = document.getElementById('loginMsg');
+
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const viewBrowse = document.getElementById('view-browse');
+  const viewGive   = document.getElementById('view-give');
+  const viewInbox  = document.getElementById('view-inbox');
+  const viewProfile= document.getElementById('view-profile');
+  const itemsList   = document.getElementById('itemsList');
+  const myItems     = document.getElementById('myItems');
+
+  const btnUpload   = document.getElementById('btnUpload');
+  const itemTitle   = document.getElementById('itemTitle');
+  const itemDesc    = document.getElementById('itemDesc');
+  const itemLoc     = document.getElementById('itemLoc');
+  const itemImage   = document.getElementById('itemImage');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const uploadBar      = uploadProgress.querySelector('span');
+  const uploadMsg      = document.getElementById('uploadMsg');
+  const btnClearUpload = document.getElementById('btnClearUpload');
+
+  const btnLogout   = document.getElementById('btnLogout');
+  const userEmailEl = document.getElementById('userEmail');
+  const roleHint    = document.getElementById('roleHint');
+
+  const chatList    = document.getElementById('chatList');
+  const chatPane    = document.getElementById('chatPane');
+  const chatHeader  = document.getElementById('chatHeader');
+  const chatBody    = document.getElementById('chatBody');
+  const chatInput   = document.getElementById('chatInput');
+  const btnSendMsg  = document.getElementById('btnSendMsg');
+
+  const pfEmail = document.getElementById('pfEmail');
+  const pfRole  = document.getElementById('pfRole');
+  const pfName  = document.getElementById('pfName');
+  const pfBio   = document.getElementById('pfBio');
+  const pfAvatar= document.getElementById('pfAvatar');
+  const pfAvatarPreview = document.getElementById('pfAvatarPreview');
+  const btnSaveProfile = document.getElementById('btnSaveProfile');
+  const btnDeleteAvatar = document.getElementById('btnDeleteAvatar');
+  const pfMsg = document.getElementById('pfMsg');
+
+  const btnOpenGive = document.getElementById('btnOpenGive');
+  const btnOpenInbox= document.getElementById('btnOpenInbox');
+  const btnOpenProfile= document.getElementById('btnOpenProfile');
+
+  const toastContainer = document.getElementById('toastContainer');
+  const inboxDot = document.getElementById('inboxDot');
+  const mbBadge = document.getElementById('mbBadge');
+  const btnDark = document.getElementById('btnDark');
+  const bgOverlay = document.getElementById('bgOverlay');
+
+  // -------------------------
+  // State
+  // -------------------------
+  let currentUser = null;
+  let profileRole = 'both';
+  let unsubItems = null;
+  let unsubMyItems = null;
+  let unsubChats = null;
+  let unsubMessages = null;
+  let openChat = { chatId: null, itemId: null };
+  let unreadCount = 0;
+
+  // rotating backgrounds (household + kids toys)
+  const backgrounds = [
+    "url('https://images.unsplash.com/photo-1581578731124-5f09f8fa1a92?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1584714262653-1c9d2d1b2f6b?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1519710164239-da123dc03ef4?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600&auto=format&fit=crop')",
+    "url('https://images.unsplash.com/photo-1582719478172-0c8b2f0b0a6d?q=80&w=1600&auto=format&fit=crop')"
+  ];
+  let bgIndex = 0;
+  function rotateBackground(){ bgOverlay.style.backgroundImage = backgrounds[bgIndex]; bgIndex = (bgIndex+1)%backgrounds.length; }
+  rotateBackground();
+  setInterval(rotateBackground, 8000);
+
+  // -------------------------
+  // Utilities
+  // -------------------------
+  function el(tag, cls, html){ const n = document.createElement(tag); if(cls) n.className = cls; if(html!==undefined) n.innerHTML = html; return n; }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function showToast({type='info', title='', text='', duration=4500, actions=[]}){
+    const t = el('div','toast '+type);
+    const content = el('div','content');
+    if(title) content.appendChild(el('div',null,`<strong>${escapeHtml(title)}</strong>`));
+    if(text) content.appendChild(el('div','muted',escapeHtml(text)));
+    t.appendChild(content);
+    const acts = el('div','actions');
+    actions.forEach(a=>{
+      const b = el('button','small');
+      b.textContent = a.label;
+      b.addEventListener('click', ()=> { a.onClick && a.onClick(); removeToast(t); });
+      acts.appendChild(b);
+    });
+    const close = el('button','small ghost'); close.textContent='Close'; close.addEventListener('click', ()=> removeToast(t));
+    acts.appendChild(close);
+    t.appendChild(acts);
+    toastContainer.appendChild(t);
+    setTimeout(()=> removeToast(t), duration);
+    return t;
+  }
+  function removeToast(node){ if(!node) return; node.style.opacity='0'; setTimeout(()=> node.remove(), 260); }
+
+  // WebAudio ping
+  const audioCtx = typeof AudioContext !== 'undefined' ? new AudioContext() : null;
+  function ping(){
+    if(!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = 880;
+    g.gain.value = 0.001;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.1, audioCtx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+    setTimeout(()=> { try{ o.stop(); }catch(e){} }, 350);
+  }
+
+  // image compress
+  async function compressImage(file, maxW=1280, quality=0.82){
+    return new Promise((resolve,reject)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+        canvas.toBlob(blob=>{
+          if(!blob) return reject(new Error('Compress failed'));
+          const out = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+          resolve(out);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = ()=> reject(new Error('Image load error'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // -------------------------
+  // Auth handlers
+  // -------------------------
+  btnShowLogin.addEventListener('click', ()=> { loginArea.style.display='block'; btnShowLogin.style.display='none'; });
+  btnShowSignup.addEventListener('click', ()=> { loginArea.style.display='none'; btnShowLogin.style.display='inline-block'; });
+
+  btnSignup.addEventListener('click', async ()=>{
+    signupMsg.textContent = '';
+    const email = signupEmail.value.trim();
+    const pass  = signupPass.value;
+    const role  = signupRole.value;
+    if(!email || pass.length < 6) return signupMsg.textContent = 'Enter valid email & 6+ char password';
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      // create profile doc
+      await setDoc(doc(db,'users',cred.user.uid), { email, role, displayName:'', bio:'', avatarUrl:'', createdAt: serverTimestamp() });
+      signupMsg.textContent = 'Account created. Logging in...';
+    }catch(e){ signupMsg.textContent = e.message; }
+  });
+
+  btnLogin.addEventListener('click', async ()=>{
+    loginMsg.textContent = '';
+    const email = loginEmail.value.trim();
+    const pass  = loginPass.value;
+    if(!email || !pass) return loginMsg.textContent = 'Enter email & password';
+    try{
+      await signInWithEmailAndPassword(auth, email, pass);
+      loginMsg.textContent = '';
+    }catch(e){ loginMsg.textContent = e.message; }
+  });
+
+  btnLogout.addEventListener('click', async ()=>{
+    await signOut(auth);
+    cleanupListeners();
+    showToast({type:'info', title:'Logged out', text:'You have been signed out.'});
+  });
+
+  // dark toggle
+  btnDark.addEventListener('click', ()=>{
+    const root = document.documentElement;
+    if(root.getAttribute('data-theme') === 'dark'){ root.setAttribute('data-theme','light'); btnDark.textContent='Dark'; }
+    else { root.setAttribute('data-theme','dark'); btnDark.textContent='Light'; }
+  });
+
+  // -------------------------
+  // Auth state watcher
+  // -------------------------
+  onAuthStateChanged(auth, async (user)=>{
+    currentUser = user;
+    if(user){
+      authCard.style.display = 'none';
+      appCard.style.display = 'block';
+      userEmailEl.textContent = user.email;
+      btnLogout.style.display = 'inline-block';
+
+      // ensure profile doc exists
+      const uref = doc(db,'users',user.uid);
+      const snap = await getDoc(uref);
+      if(!snap.exists()){
+        await setDoc(uref, { email:user.email, role:'both', displayName:'', bio:'', avatarUrl:'', createdAt: serverTimestamp() });
+        profileRole = 'both';
+      } else {
+        const ud = snap.data();
+        profileRole = ud.role || 'both';
+        pfName.value = ud.displayName || '';
+        pfBio.value = ud.bio || '';
+        pfAvatarPreview.src = ud.avatarUrl || '';
+      }
+      pfEmail.textContent = user.email;
+      pfRole.value = profileRole;
+      roleHint.textContent = `You are set as "${profileRole}".`;
+
+      // hide give tab if taker
+      document.querySelectorAll('.tab').forEach(t => {
+        if(t.dataset.tab === 'give') t.style.display = (profileRole === 'taker') ? 'none' : '';
+      });
+
+      // initial tab
+      setActiveTab('browse');
+
+      // start unread watcher & listeners
+      startUnreadWatcher();
+    } else {
+      // signed out
+      authCard.style.display = 'block';
+      appCard.style.display = 'none';
+      userEmailEl.textContent = '';
+      btnLogout.style.display = 'none';
+      cleanupListeners();
+      itemsList.innerHTML=''; myItems.innerHTML=''; chatList.innerHTML=''; setBadge(0);
+    }
+  });
+
+  // -------------------------
+  // Tab navigation
+  // -------------------------
+  function setActiveTab(name){
+    tabs.forEach(t=> t.classList.toggle('active', t.dataset.tab===name));
+    viewBrowse.style.display = (name==='browse') ? '' : 'none';
+    viewGive.style.display   = (name==='give') ? '' : 'none';
+    viewInbox.style.display  = (name==='inbox') ? '' : 'none';
+    viewProfile.style.display= (name==='profile') ? '' : 'none';
+    if(name==='browse') loadItemsFeed();
+    if(name==='give') loadMyItems();
+    if(name==='inbox') loadChatList();
+  }
+  document.querySelectorAll('.tab').forEach(t=> t.addEventListener('click', ()=> setActiveTab(t.dataset.tab)));
+  btnOpenGive.addEventListener('click', ()=> setActiveTab('give'));
+  btnOpenInbox.addEventListener('click', ()=> setActiveTab('inbox'));
+  btnOpenProfile.addEventListener('click', ()=> setActiveTab('profile'));
+  document.getElementById('mbBrowse').addEventListener('click', ()=> setActiveTab('browse'));
+  document.getElementById('mbGive').addEventListener('click', ()=> setActiveTab('give'));
+  document.getElementById('mbInbox').addEventListener('click', ()=> setActiveTab('inbox'));
+  document.getElementById('mbProfile').addEventListener('click', ()=> setActiveTab('profile'));
+
+  // -------------------------
+  // Upload flow with compress + progress + toasts
+  // -------------------------
+  btnClearUpload.addEventListener('click', ()=> { itemTitle.value=''; itemDesc.value=''; itemLoc.value=''; itemImage.value=''; uploadMsg.textContent=''; });
+
+  btnUpload.addEventListener('click', async ()=>{
+    if(!currentUser) return showToast({type:'error', title:'Not signed in', text:'Sign in to upload.'});
+    if(profileRole === 'taker') return showToast({type:'error', title:'Role restriction', text:'Switch to giver or both to upload.'});
+    const title = itemTitle.value.trim();
+    const description = itemDesc.value.trim();
+    const location = itemLoc.value.trim();
+    const file = itemImage.files[0];
+    if(!title || !location || !file) return showToast({type:'error', title:'Missing fields', text:'Title, location and image required.'});
+
+    try{
+      showToast({type:'info', title:'Uploading', text:'Uploading item...', duration:3000});
+      uploadProgress.classList.remove('hide'); uploadBar.style.width='0%';
+
+      const compressed = await compressImage(file, 1280, 0.82);
+      const path = `items/${currentUser.uid}/${Date.now()}_${compressed.name}`;
+      const sref = ref(storage, path);
+      const task = uploadBytesResumable(sref, compressed);
+      task.on('state_changed', snap=> {
+        const pct = Math.round(100 * snap.bytesTransferred / snap.totalBytes);
+        uploadBar.style.width = pct + '%';
+      });
+      await task;
+      const imageUrl = await getDownloadURL(sref);
+
+      // get display name
+      const udSnap = await getDoc(doc(db,'users',currentUser.uid));
+      const display = udSnap.exists() ? (udSnap.data().displayName || currentUser.email) : currentUser.email;
+
+      await addDoc(collection(db,'items'), {
+        title, description, location, imageUrl, storagePath: path,
+        ownerUid: currentUser.uid, ownerEmail: display,
+        available: true, createdAt: serverTimestamp()
+      });
+
+      uploadProgress.classList.add('hide'); uploadBar.style.width='0%';
+      itemTitle.value=''; itemDesc.value=''; itemLoc.value=''; itemImage.value='';
+      showToast({type:'success', title:'Upload successful', text:'Item uploaded successfully', duration:3500});
+      loadMyItems(); loadItemsFeed();
+      if(profileRole !== 'giver') setActiveTab('browse');
+    }catch(e){
+      uploadProgress.classList.add('hide'); uploadBar.style.width='0%';
+      showToast({type:'error', title:'Upload failed', text: e.message || 'Try again', duration:5000});
+    }
+  });
+
+  // -------------------------
+  // Items feed
+  // -------------------------
+  function loadItemsFeed(){
+    if(unsubItems) unsubItems();
+    itemsList.innerHTML = '<div class="muted">Loading items...</div>';
+    const q = query(collection(db,'items'), orderBy('createdAt','desc'));
+    unsubItems = onSnapshot(q, snap=>{
+      itemsList.innerHTML = '';
+      if(snap.empty){ itemsList.innerHTML = '<div class="muted">No items yet.</div>'; return; }
+      snap.forEach(docSnap=>{
+        const d = docSnap.data();
+        if(d.available === false) return;
+        itemsList.appendChild(renderItemCard(docSnap.id, d));
+      });
+    });
+  }
+
+  function renderItemCard(id,d){
+    const card = el('div','item');
+    const img = el('img'); img.src = d.imageUrl || ''; card.appendChild(img);
+    const body = el('div','pad');
+    body.appendChild(el('div',null,`<strong>${escapeHtml(d.title || 'Untitled')}</strong>`));
+    if(d.description) body.appendChild(el('div','muted', escapeHtml(d.description)));
+    body.appendChild(el('div','meta', `${escapeHtml(d.location||'')} • ${escapeHtml(d.ownerEmail||'')}`));
+    const row = el('div','row'); row.style.marginTop='8px';
+    if(currentUser && currentUser.uid === d.ownerUid){
+      row.appendChild(el('div','chip','Your item'));
+      const manage = el('button','ghost small'); manage.textContent='Manage'; manage.addEventListener('click', ()=> setActiveTab('give'));
+      row.appendChild(manage);
+    } else {
+      const btn = el('button'); btn.textContent = 'I\'m interested (chat)'; btn.onclick = ()=> startOrOpenChat(id,d);
+      row.appendChild(btn);
+    }
+    body.appendChild(row);
+    card.appendChild(body);
+    return card;
+  }
+
+  // -------------------------
+  // My items
+  // -------------------------
+  function loadMyItems(){
+    if(!currentUser) return;
+    if(unsubMyItems) unsubMyItems();
+    myItems.innerHTML = '<div class="muted">Loading…</div>';
+    const q = query(collection(db,'items'), where('ownerUid','==',currentUser.uid), orderBy('createdAt','desc'));
+    unsubMyItems = onSnapshot(q, snap=>{
+      myItems.innerHTML = '';
+      if(snap.empty){ myItems.innerHTML = '<div class="muted">No uploads yet.</div>'; return; }
+      snap.forEach(docSnap=>{
+        const node = renderItemCard(docSnap.id, docSnap.data());
+        const del = el('button','ghost small'); del.textContent='Mark unavailable';
+        del.addEventListener('click', ()=> markUnavailable(docSnap.id, docSnap.data()));
+        node.querySelector('.pad').appendChild(del);
+        myItems.appendChild(node);
+      });
+    });
+  }
+
+  async function markUnavailable(itemId,d){
+    if(!confirm('Mark this item unavailable?')) return;
+    try{
+      if(d.storagePath) await deleteObject(ref(storage,d.storagePath)).catch(()=>{});
+      await updateDoc(doc(db,'items',itemId), { available:false });
+      showToast({type:'success', title:'Removed', text:'Item marked unavailable.'});
+      loadMyItems();
+    }catch(e){ showToast({type:'error', title:'Failed', text:e.message}); }
+  }
+
+  // -------------------------
+  // Chat: per-item chats & notifications
+  // -------------------------
+  async function startOrOpenChat(itemId, item){
+    if(!currentUser) return showToast({type:'error', title:'Sign in', text:'Please sign in to chat.'});
+    if(currentUser.uid === item.ownerUid) return showToast({type:'info', title:'Your item', text:'You uploaded this item.'});
+
+    const chatId = `${itemId}_${currentUser.uid}`;
+    const cref = doc(db,'chats',chatId);
+    const snap = await getDoc(cref);
+    if(!snap.exists()){
+      await setDoc(cref, {
+        itemId, itemTitle: item.title || '',
+        giverUid: item.ownerUid, takerUid: currentUser.uid,
+        participantEmails: [item.ownerEmail || '', currentUser.email],
+        hasUnreadFor: [item.ownerUid],
+        updatedAt: serverTimestamp()
+      });
+      await addDoc(collection(db,'chats',chatId,'messages'), {
+        senderUid: currentUser.uid, senderEmail: currentUser.email,
+        text: `Hi — I'm interested in "${item.title}".`, timestamp: serverTimestamp()
+      });
+    } else {
+      // mark unread for other
+      const data = snap.data();
+      const other = (currentUser.uid === data.giverUid) ? data.takerUid : data.giverUid;
+      const set = new Set(data.hasUnreadFor || []); set.add(other);
+      await updateDoc(cref, { hasUnreadFor: Array.from(set), updatedAt: serverTimestamp() });
+    }
+
+    openChat = { chatId, itemId };
+    openChatWindow(chatId, item.title || 'Conversation');
+    setActiveTab('inbox');
+  }
+
+  function loadChatList(){
+    if(!currentUser) return;
+    if(unsubChats) unsubChats();
+    chatList.innerHTML = '<div class="muted">Loading chats…</div>';
+    const q1 = query(collection(db,'chats'), where('giverUid','==',currentUser.uid));
+    const q2 = query(collection(db,'chats'), where('takerUid','==',currentUser.uid));
+
+    let docsA = [], docsB = [];
+    const collate = ()=>{
+      const all = [...docsA, ...docsB];
+      if(all.length===0){ chatList.innerHTML = '<div class="muted">No conversations yet.</div>'; setBadge(0); return; }
+      all.sort((a,b)=> (b.data.updatedAt?.seconds||0) - (a.data.updatedAt?.seconds||0) );
+      chatList.innerHTML = '';
+      all.forEach(({id,data})=>{
+        const card = el('div','card');
+        card.appendChild(el('div',null,`<strong>${escapeHtml(data.itemTitle || 'Item')}</strong>`));
+        card.appendChild(el('div','muted', (data.participantEmails||[]).join(', ') ));
+        const row = el('div','row');
+        const open = el('button','small'); open.textContent = 'Open chat';
+        open.addEventListener('click', ()=> { openChat = { chatId:id, itemId: data.itemId }; openChatWindow(id, data.itemTitle || 'Chat'); });
+        const unread = (data.hasUnreadFor||[]).includes(currentUser.uid);
+        const dot = el('span','badge'); dot.textContent='New'; dot.style.display = unread ? 'inline-block' : 'none';
+        row.appendChild(open); row.appendChild(dot);
+        card.appendChild(row);
+        chatList.appendChild(card);
+      });
+      const count = all.filter(a=> (a.data.hasUnreadFor||[]).includes(currentUser.uid)).length;
+      setBadge(count);
+    };
+
+    const unsub1 = onSnapshot(q1,snap=>{ docsA = snap.docs.map(d=>({id:d.id, data:d.data()})); collate(); });
+    const unsub2 = onSnapshot(q2,snap=>{ docsB = snap.docs.map(d=>({id:d.id, data:d.data()})); collate(); });
+    unsubChats = ()=>{ unsub1(); unsub2(); };
+  }
+
+  function openChatWindow(chatId, title){
+    chatPane.classList.remove('hide');
+    chatHeader.textContent = `Chat: ${title}`;
+    // mark read
+    updateDoc(doc(db,'chats',chatId), { hasUnreadFor: [] }).catch(()=>{});
+    if(unsubMessages) unsubMessages();
+    const q = query(collection(db,'chats',chatId,'messages'), orderBy('timestamp','asc'));
+    unsubMessages = onSnapshot(q, snap=>{
+      chatBody.innerHTML = '';
+      if(snap.empty){ chatBody.innerHTML = '<div class="muted">No messages yet.</div>'; return; }
+      snap.forEach(d=>{ const m = d.data(); const b = el('div','bubble ' + (m.senderUid === currentUser.uid ? 'me':'them')); b.textContent = `${m.senderUid===currentUser.uid ? 'You' : (m.senderEmail||'')} : ${m.text}`; chatBody.appendChild(b); });
+      chatBody.scrollTop = chatBody.scrollHeight;
+    });
+  }
+
+  btnSendMsg.addEventListener('click', async ()=>{
+    const text = chatInput.value.trim();
+    if(!text || !openChat.chatId || !currentUser) return;
+    try{
+      await addDoc(collection(db,'chats',openChat.chatId,'messages'), {
+        senderUid: currentUser.uid, senderEmail: currentUser.email, text, timestamp: serverTimestamp()
+      });
+      const cref = doc(db,'chats',openChat.chatId);
+      const snap = await getDoc(cref);
+      if(snap.exists()){
+        const d = snap.data();
+        const other = (currentUser.uid === d.giverUid) ? d.takerUid : d.giverUid;
+        const set = new Set(d.hasUnreadFor || []); set.add(other);
+        await updateDoc(cref, { hasUnreadFor: Array.from(set), updatedAt: serverTimestamp() });
+      }
+      chatInput.value='';
+    }catch(e){ showToast({type:'error', title:'Send failed', text:e.message}); }
+  });
+
+  // -------------------------
+  // Global chat watcher -> notifications & ping
+  // -------------------------
+  function startUnreadWatcher(){
+    if(unsubChats) unsubChats();
+    const q1 = query(collection(db,'chats'), where('giverUid','==',currentUser.uid));
+    const q2 = query(collection(db,'chats'), where('takerUid','==',currentUser.uid));
+    const handle = async (snap)=>{
+      for(const d of snap.docs){
+        const data = d.data();
+        const hasUnread = (data.hasUnreadFor || []).includes(currentUser.uid);
+        if(hasUnread){
+          showToast({
+            type:'info', title:'New message', text:`New message about: ${data.itemTitle || 'an item'}`,
+            duration:6000,
+            actions: [{ label:'View Chat', onClick: ()=> { openChat = { chatId: d.id, itemId: data.itemId }; openChatWindow(d.id, data.itemTitle || 'Chat'); setActiveTab('inbox'); } }]
+          });
+          try{ ping(); }catch(e){}
+        }
+      }
+      // refresh chat list / badge
+      loadChatList();
+    };
+    const unsub1 = onSnapshot(q1, snap=> handle(snap));
+    const unsub2 = onSnapshot(q2, snap=> handle(snap));
+    unsubChats = ()=> { unsub1(); unsub2(); };
+    loadChatList();
+  }
+
+  function setBadge(n){ unreadCount = n; if(n>0){ inboxDot.style.display='inline-block'; inboxDot.textContent = String(n); mbBadge.style.display='inline-block'; mbBadge.textContent=String(n);} else { inboxDot.style.display='none'; mbBadge.style.display='none'; } }
+
+  // -------------------------
+  // Profile save
+  // -------------------------
+  pfAvatar.addEventListener('change', ()=> {
+    const f = pfAvatar.files[0];
+    if(f) pfAvatarPreview.src = URL.createObjectURL(f);
+  });
+
+  btnSaveProfile.addEventListener('click', async ()=>{
+    if(!currentUser) return showToast({type:'error', title:'Not signed in'});
+    try{
+      let avatarUrl = pfAvatarPreview.src || '';
+      if(pfAvatar.files[0]){
+        const compressed = await compressImage(pfAvatar.files[0], 640, 0.82);
+        const path = `avatars/${currentUser.uid}_${Date.now()}.jpg`;
+        const sref = ref(storage,path);
+        const task = uploadBytesResumable(sref, compressed);
+        await task;
+        avatarUrl = await getDownloadURL(sref);
+      }
+      await updateDoc(doc(db,'users',currentUser.uid), { displayName: pfName.value||'', bio: pfBio.value||'', role: pfRole.value||'both', avatarUrl: avatarUrl||'' });
+      try{ await updateProfile(currentUser,{ displayName: pfName.value||null, photoURL: avatarUrl||null }); }catch(e){}
+      profileRole = pfRole.value||'both';
+      showToast({type:'success', title:'Profile saved', text:'Your profile was updated.'});
+      document.querySelectorAll('.tab').forEach(t => { if(t.dataset.tab === 'give') t.style.display = (profileRole === 'taker') ? 'none' : ''; });
+    }catch(e){ showToast({type:'error', title:'Save failed', text:e.message}); }
+  });
+
+  btnDeleteAvatar.addEventListener('click', async ()=>{
+    if(!currentUser) return;
+    await updateDoc(doc(db,'users',currentUser.uid), { avatarUrl: '' });
+    pfAvatarPreview.src = '';
+    showToast({type:'success', title:'Avatar removed'});
+  });
+
+  // -------------------------
+  // listeners + helpers
+  // -------------------------
+  function cleanupListeners(){ [unsubItems, unsubMyItems, unsubChats, unsubMessages].forEach(u=> u && u()); unsubItems=unsubMyItems=unsubChats=unsubMessages=null; }
+  document.getElementById('btnRefresh').addEventListener('click', ()=> loadItemsFeed());
+  document.getElementById('search').addEventListener('input', ()=> {
+    const q = document.getElementById('search').value.toLowerCase();
+    [...itemsList.children].forEach(card=> card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none');
+  });
+
+  // -------------------------
+  // initial background + mobile nav
+  // -------------------------
+  document.getElementById('mbBrowse').addEventListener('click', ()=> setActiveTab('browse'));
+  document.getElementById('mbGive').addEventListener('click', ()=> setActiveTab('give'));
+  document.getElementById('mbInbox').addEventListener('click', ()=> setActiveTab('inbox'));
+  document.getElementById('mbProfile').addEventListener('click', ()=> setActiveTab('profile'));
+
+  // -------------------------
+  // End of module
+  // -------------------------
+  </script>
+</body>
+</html>
